@@ -38,18 +38,20 @@ jobs:
       matrix:
         include:
         - os: ubuntu-latest
-          triple: i586-unknown-linux-gnu
+          triple: i686-unknown-linux-gnu
+          target: i586-unknown-linux-gnu
         - os: windows-latest
-          triple: i586-pc-windows-msvc
+          triple: i686-pc-windows-msvc
+          target: i586-pc-windows-msvc
     runs-on: ${{ matrix.os }}
     steps:
     - uses: actions-rs/toolchain@v1
       with:
         toolchain: nightly
         override: true
-    - run: "rustup target add ${{ matrix.triple }}"
+    - run: "rustup target add ${{ matrix.target }}"
     - run: "rustup component add rust-src --toolchain nightly-${{ matrix.triple }}"
     - uses: actions/checkout@v2
-    - run: "cargo +nightly build --verbose -Z build-std=core,panic_abort --target ${{ matrix.triple }} --release"
+    - run: "cargo +nightly build --verbose -Z build-std=core,panic_abort --target ${{ matrix.target }} --release"
       working-directory: ensure_no_std
-    - run: "./ensure_no_std/target/${{ matrix.triple }}/release/ensure_no_std"
+    - run: "./ensure_no_std/target/${{ matrix.target }}/release/ensure_no_std"

@@ -3,6 +3,8 @@
 #![doc(test(attr(allow(dead_code))))]
 #![doc(test(attr(allow(unused_variables))))]
 
+#![no_std]
+
 use core::arch::asm;
 use core::mem::{MaybeUninit, size_of};
 use core::num::NonZeroU8;

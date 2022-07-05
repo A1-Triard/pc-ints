@@ -24,7 +24,6 @@ jobs:
       with:
         toolchain: "${{ matrix.rust }}"
         override: true
-    - run: "rustup target add i586-pc-windows-msvc"
     - run: "rustup component add clippy"
     - uses: actions/checkout@v2
     - run: "cargo build --verbose"
@@ -32,6 +31,28 @@ jobs:
     - run: "cargo build --verbose --release"
     - run: "cargo outdated --verbose --aggresssive --root-deps-only --exit-code 1"
     - run: "cargo clippy --verbose"
+  dos:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macOS-latest]
+        rust: ["1.61", "stable", "beta", "nightly"]
+    env:
+      RUSTFLAGS: "--cfg=dos"
+      RUSTDOCFLAGS: "--cfg=dos"
+    runs-on: ${{ matrix.os }}
+    steps:
+    - uses: actions-rs/toolchain@v1
+      with:
+        toolchain: "${{ matrix.rust }}"
+        override: true
+    - run: "rustup target add i586-pc-windows-msvc"
+    - run: "rustup component add clippy"
+    - uses: actions/checkout@v2
+    - run: "cargo build --verbose --target=i586-pc-windows-msvc"
+    - run: "cargo doc --verbose --target=i586-pc-windows-msvc"
+    - run: "cargo build --verbose --release --target=i586-pc-windows-msvc"
+    - run: "cargo clippy --verbose --target=i586-pc-windows-msvc"
   ensure_no_std:
     strategy:
       fail-fast: false
@@ -43,6 +64,8 @@ jobs:
         - os: windows-latest
           triple: x86_64-pc-windows-msvc
           target: i586-pc-windows-msvc
+    env:
+      RUSTFLAGS: "--cfg=dos"
     runs-on: ${{ matrix.os }}
     steps:
     - uses: actions-rs/toolchain@v1

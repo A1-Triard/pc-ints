@@ -1,0 +1,11 @@
+#!/bin/sh
+set -eu
+
+cd "$(dirname "$(realpath "$0")")"
+
+triple=i586-"$(rustc -Vv | awk -F ': ' '{ if($1 == "host") print $2 }' | cut --complement -zd - -f 1)"
+
+cargo +nightly build \
+    -Z build-std=core,panic_abort \
+    --target "$triple" \
+    --release

@@ -4,6 +4,10 @@
 
 #![no_std]
 
+#[cfg(windows)]
+#[link(name="msvcrt")]
+extern { }
+
 #[panic_handler]
 extern fn panic(_info: &core::panic::PanicInfo) -> ! {
     exit_no_std::exit(99)

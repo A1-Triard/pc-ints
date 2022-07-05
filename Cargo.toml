@@ -1,8 +1,16 @@
 [package]
-name = "pc-ints"
-version = "0.1.0"
 edition = "2021"
+name = "pc-ints"
+version = "0.0.1"
+rust-version = "1.61"
+authors = ["warlock <internalmike@gmail.com>"]
+description = "PC retro interrupts (BIOS, DOS, VGA, DPMI, etc.)."
+readme = "README.md"
+documentation = "https://docs.rs/pc-ints/"
+keywords = ["pc", "dos", "ibm", "interrupt", "dpmi"]
+categories = ["os", "no-std"]
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/A1-Triard/pc-ints"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
-[dependencies]
+[badges]
+maintenance = { status = "experimental" }

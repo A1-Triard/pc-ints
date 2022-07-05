@@ -161,8 +161,7 @@ pub fn int_21h_ax_6601h_code_page() -> Result<CodePage, AxErr> {
 #[inline]
 fn p32<T>(p: *const T) -> u32 {
     assert!(size_of::<*const T>() == size_of::<u32>());
-    let v = p as usize as u32;
-    v
+    p as usize as u32
 }
 
 #[derive(Debug, Clone)]

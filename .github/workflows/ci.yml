@@ -24,11 +24,10 @@ jobs:
       with:
         toolchain: "${{ matrix.rust }}"
         override: true
+    - run: "rustup target add i586-pc-windows-msvc"
     - run: "rustup component add clippy"
     - uses: actions/checkout@v2
     - run: "cargo build --verbose"
-    - run: "cargo test --verbose --tests"
-    - run: "cargo test --verbose --doc"
     - run: "cargo doc --verbose"
     - run: "cargo build --verbose --release"
     - run: "cargo outdated --verbose --aggresssive --root-deps-only --exit-code 1"

@@ -49,6 +49,7 @@ jobs:
       with:
         toolchain: nightly
         override: true
+    - run: "rustup toolchain install nightly-${{ matrix.triple }}"
     - run: "rustup target add ${{ matrix.target }}"
     - run: "rustup component add rust-src --toolchain nightly-${{ matrix.triple }}"
     - uses: actions/checkout@v2

@@ -2,7 +2,7 @@
 edition = "2021"
 name = "pc-ints"
 version = "0.1.0"
-rust-version = "1.61"
+#rust-version = "nightly"
 authors = ["warlock <internalmike@gmail.com>"]
 description = "PC retro interrupts (BIOS, DOS, VGA, DPMI, etc.)."
 readme = "README.md"

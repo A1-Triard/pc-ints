@@ -49,7 +49,7 @@ jobs:
         toolchain: nightly
         override: true
     - run: "rustup component add clippy"
-    - run: "rustup component add rust-src --toolchain nightly-${{ env.tool }}"
+    - run: "rustup component add rust-src --toolchain nightly-${{ matrix.tool }}"
     - uses: actions/checkout@v2
     - run: "cargo +nightly build --verbose --target=i386-pc-dos-msvc.json -Z build-std=core,panic_abort"
     - run: "cargo +nightly doc --verbose --target=i386-pc-windows-msvc.json -Z build-std=core,panic_abort"

@@ -609,3 +609,45 @@ pub fn int_10h_ah_0Fh_video_mode() -> VideoMode {
         bh_active_page: (bx_active_page >> 8) as u8,
     }
 }
+
+pub struct IntVec {
+    pub ebx_int_vec: u32,
+}
+
+#[cfg(not(target_os="dos"))]
+#[allow(unused_variables)]
+pub fn int_10h_ah_35h_get_int_vec(al_int: u8) -> IntVec {
+    panic!("cfg(target_os=\"dos\")");
+}
+
+#[cfg(target_os="dos")]
+#[inline]
+pub fn int_10h_ah_35h_get_int_vec(al_int: u8) -> IntVec {
+    let mut ebx_int_vec: u32;
+    unsafe {
+        asm!(
+            "int 0x21",
+            in("ax") 0x3500u16 | al_int as u16,
+            lateout("ebx") ebx_int_vec,
+        );
+    }
+    IntVec { ebx_int_vec }
+}
+
+#[cfg(not(target_os="dos"))]
+#[allow(unused_variables)]
+pub fn int_10h_ah_25h_set_int_vec(al_int: u8, edx_int_vec: *mut u8) {
+    panic!("cfg(target_os=\"dos\")");
+}
+
+#[cfg(target_os="dos")]
+#[inline]
+pub fn int_10h_ah_25h_set_int_vec(al_int: u8, edx_int_vec: *mut u8) {
+    unsafe {
+        asm!(
+            "int 0x21",
+            in("ax") 0x2500u16 | al_int as u16,
+            in("edx") p32(edx_int_vec),
+        );
+    }
+}

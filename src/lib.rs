@@ -610,44 +610,44 @@ pub fn int_10h_ah_0Fh_video_mode() -> VideoMode {
     }
 }
 
-pub struct IntVec {
-    pub ebx_int_vec: u32,
+pub struct IntHandler {
+    pub ebx_int_handler: u32,
 }
 
 #[cfg(not(target_os="dos"))]
 #[allow(unused_variables)]
-pub fn int_10h_ah_35h_get_int_vec(al_int: u8) -> IntVec {
+pub fn int_21h_ah_35h_get_int(al_int_vec: u8) -> IntHandler {
     panic!("cfg(target_os=\"dos\")");
 }
 
 #[cfg(target_os="dos")]
 #[inline]
-pub fn int_10h_ah_35h_get_int_vec(al_int: u8) -> IntVec {
-    let mut ebx_int_vec: u32;
+pub fn int_21h_ah_35h_get_int(al_int_vec: u8) -> IntHandler {
+    let mut ebx_int_handler: u32;
     unsafe {
         asm!(
             "int 0x21",
-            in("ax") 0x3500u16 | al_int as u16,
-            lateout("ebx") ebx_int_vec,
+            in("ax") 0x3500u16 | al_int_vec as u16,
+            lateout("ebx") ebx_int_handler,
         );
     }
-    IntVec { ebx_int_vec }
+    IntHandler { ebx_int_handler }
 }
 
 #[cfg(not(target_os="dos"))]
 #[allow(unused_variables)]
-pub fn int_10h_ah_25h_set_int_vec(al_int: u8, edx_int_vec: *mut u8) {
+pub fn int_21h_ah_25h_set_int(al_int_vec: u8, edx_int_handler: *mut u8) {
     panic!("cfg(target_os=\"dos\")");
 }
 
 #[cfg(target_os="dos")]
 #[inline]
-pub fn int_10h_ah_25h_set_int_vec(al_int: u8, edx_int_vec: *mut u8) {
+pub fn int_21h_ah_25h_set_int(al_int_vec: u8, edx_int_handler: *mut u8) {
     unsafe {
         asm!(
             "int 0x21",
-            in("ax") 0x2500u16 | al_int as u16,
-            in("edx") p32(edx_int_vec),
+            in("ax") 0x2500u16 | al_int_vec as u16,
+            in("edx") p32(edx_int_handler),
         );
     }
 }

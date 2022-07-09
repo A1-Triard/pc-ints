@@ -636,18 +636,18 @@ pub fn int_21h_ah_35h_get_int(al_int_vec: u8) -> IntHandler {
 
 #[cfg(not(target_os="dos"))]
 #[allow(unused_variables)]
-pub fn int_21h_ah_25h_set_int(al_int_vec: u8, edx_int_handler: *mut u8) {
+pub fn int_21h_ah_25h_set_int(al_int_vec: u8, edx_int_handler: u32) {
     panic!("cfg(target_os=\"dos\")");
 }
 
 #[cfg(target_os="dos")]
 #[inline]
-pub fn int_21h_ah_25h_set_int(al_int_vec: u8, edx_int_handler: *mut u8) {
+pub fn int_21h_ah_25h_set_int(al_int_vec: u8, edx_int_handler: u32) {
     unsafe {
         asm!(
             "int 0x21",
             in("ax") 0x2500u16 | al_int_vec as u16,
-            in("edx") p32(edx_int_handler),
+            in("edx") edx_int_handler,
         );
     }
 }

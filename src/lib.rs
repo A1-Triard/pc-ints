@@ -448,7 +448,8 @@ pub fn int_21h_ah_06h_dl_FFh_inkey() -> Option<AlChar> {
 
 #[derive(Debug, Clone)]
 pub struct CxDxAddr {
-    pub cx_dx_addr: u32,
+    pub cx_segment: u16,
+    pub dx_offset: u16,
 }
 
 #[cfg(not(target_os="dos"))]
@@ -478,9 +479,52 @@ pub fn int_31h_ax_0006h_segment_addr(bx_selector: u16) -> Result<CxDxAddr, AxErr
         );
     }
     if ((flags >> 8) as u8) & CF == 0 {
-        Ok(CxDxAddr { cx_dx_addr: ((cx as u32) << 16) | (dx as u32) })
+        Ok(CxDxAddr { cx_segment: cx, dx_offset: dx })
     } else {
         Err(AxErr { ax_err })
+    }
+}
+
+#[cfg(not(target_os="dos"))]
+#[allow(unused_variables)]
+pub fn int_31h_ax_0200h_get_rm_int(bl_vec_num: u8) -> CxDxAddr {
+    panic!("cfg(target_os=\"dos\")");
+}
+
+#[cfg(target_os="dos")]
+#[inline]
+pub fn int_31h_ax_0200h_get_rm_int(bl_vec_num: u8) -> CxDxAddr {
+    let mut cx: u16;
+    let mut dx: u16;
+    unsafe {
+        asm!(
+            "int 0x31",
+            in("ax") 0x0200u16,
+            in("bx") bl_vec_num as u16,
+            lateout("cx") cx,
+            lateout("dx") dx,
+        );
+    }
+    CxDxAddr { cx_segment: cx, dx_offset: dx }
+}
+
+#[cfg(not(target_os="dos"))]
+#[allow(unused_variables)]
+pub fn int_31h_ax_0201h_set_rm_int(bl_vec_num: u8, cx_int_handler_segment: u16, dx_int_handler_offset: u16) {
+    panic!("cfg(target_os=\"dos\")");
+}
+
+#[cfg(target_os="dos")]
+#[inline]
+pub fn int_31h_ax_0201h_set_rm_int(bl_vec_num: u8, cx_int_handler_segment: u16, dx_int_handler_offset: u16) {
+    unsafe {
+        asm!(
+            "int 0x31",
+            in("ax") 0x0201u16,
+            in("bx") bl_vec_num as u16,
+            in("cx") cx_int_handler_segment,
+            in("dx") dx_int_handler_offset,
+        );
     }
 }
 
@@ -616,18 +660,18 @@ pub struct IntHandler {
 
 #[cfg(not(target_os="dos"))]
 #[allow(unused_variables)]
-pub fn int_21h_ah_35h_get_int(al_int_vec: u8) -> IntHandler {
+pub fn int_21h_ah_35h_get_int(al_vec_num: u8) -> IntHandler {
     panic!("cfg(target_os=\"dos\")");
 }
 
 #[cfg(target_os="dos")]
 #[inline]
-pub fn int_21h_ah_35h_get_int(al_int_vec: u8) -> IntHandler {
+pub fn int_21h_ah_35h_get_int(al_vec_num: u8) -> IntHandler {
     let mut ebx_int_handler: u32;
     unsafe {
         asm!(
             "int 0x21",
-            in("ax") 0x3500u16 | al_int_vec as u16,
+            in("ax") 0x3500u16 | al_vec_num as u16,
             lateout("ebx") ebx_int_handler,
         );
     }
@@ -636,17 +680,17 @@ pub fn int_21h_ah_35h_get_int(al_int_vec: u8) -> IntHandler {
 
 #[cfg(not(target_os="dos"))]
 #[allow(unused_variables)]
-pub fn int_21h_ah_25h_set_int(al_int_vec: u8, edx_int_handler: u32) {
+pub fn int_21h_ah_25h_set_int(al_vec_num: u8, edx_int_handler: u32) {
     panic!("cfg(target_os=\"dos\")");
 }
 
 #[cfg(target_os="dos")]
 #[inline]
-pub fn int_21h_ah_25h_set_int(al_int_vec: u8, edx_int_handler: u32) {
+pub fn int_21h_ah_25h_set_int(al_vec_num: u8, edx_int_handler: u32) {
     unsafe {
         asm!(
             "int 0x21",
-            in("ax") 0x2500u16 | al_int_vec as u16,
+            in("ax") 0x2500u16 | al_vec_num as u16,
             in("edx") edx_int_handler,
         );
     }

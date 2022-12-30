@@ -272,6 +272,37 @@ pub fn int_21h_ah_3Dh_open(dx_path_z: *const u8, al_mode: u8) -> Result<AxHandle
     }
 }
 
+#[cfg(not(target_os="dos"))]
+#[allow(non_snake_case)]
+#[allow(unused_variables)]
+pub fn int_21h_ah_3Eh_close(bx_handle: u16) -> Result<(), AxErr> {
+    panic!("cfg(target_os=\"dos\")");
+}
+
+#[cfg(target_os="dos")]
+#[allow(non_snake_case)]
+#[inline]
+pub fn int_21h_ah_3Eh_close(bx_handle: u16) -> Result<(), AxErr> {
+    let mut ax: u16;
+    let mut flags: u16;
+    unsafe {
+        asm!(
+            "int 0x21",
+            "mov {ax:x}, ax",
+            "lahf",
+            ax = lateout(reg) ax,
+            in("ax") 0x3e00u16,
+            in("bx") bx_handle,
+            lateout("ax") flags,
+        );
+    }
+    if ((flags >> 8) as u8) & CF == 0 {
+        Ok(())
+    } else {
+        Err(AxErr { ax_err: ax })
+    }
+}
+
 #[derive(Debug, Clone)]
 pub struct AxRead {
     pub ax_read: u16,

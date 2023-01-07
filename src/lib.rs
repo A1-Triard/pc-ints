@@ -1,3 +1,5 @@
+#![feature(asm_const)]
+
 #![deny(warnings)]
 #![doc(test(attr(deny(warnings))))]
 #![doc(test(attr(allow(dead_code))))]
@@ -11,6 +13,8 @@ use core::mem::MaybeUninit;
 #[cfg(target_os="dos")]
 use core::mem::size_of;
 use core::num::NonZeroU8;
+#[cfg(target_os="dos")]
+use memoffset::offset_of;
 
 pub const DOS_ERR_FUNC_NUM_INVALID: u8 = 1;
 pub const DOS_ERR_FILE_NOT_FOUND: u8 = 2;
@@ -454,26 +458,78 @@ pub fn int_21h_ah_06h_dl_FFh_inkey() -> Option<AlChar> {
 }
 
 #[cfg(target_os="dos")]
+#[repr(C)]
+struct RmRegs {
+    edi: u32,
+    esi: u32,
+    ebp: u32,
+    zero: u32,
+    ebx: u32,
+    edx: u32,
+    ecx: u32,
+    eax: u32,
+    flags: u16,
+    es: u16,
+    ds: u16,
+    fs: u16,
+    gs: u16,
+    ip: u16,
+    cs: u16,
+    sp: u16,
+    ss: u16,
+}
+
+pub struct DpmiErr(pub u16);
+
+#[cfg(target_os="dos")]
 #[allow(non_snake_case)]
 #[inline]
-pub fn int_21h_ah_06h_dl_FFh_inkey() -> Option<AlChar> {
-    let mut ax: u16;
+pub fn int_21h_ah_06h_dl_FFh_inkey() -> Result<Option<AlChar>, DpmiErr> {
+    let mut regs = RmRegs {
+        es: 0, ds: 0, fs: 0, gs: 0, ip: 0, cs: 0, sp: 0, ss: 0,
+        edi: 0, esi: 0, ebp: 0, zero: 0, ebx: 0, ecx: 0, flags: 0,
+        edx: 0x00FF,
+        eax: 0x0600,
+    };
+    let regs = &mut regs;
+    let regs = regs as *mut _;
+    let mut regs = p32(regs);
     let mut flags: u16;
+    let mut ax_err: u16;
     unsafe {
         asm!(
-            "int 0x21",
-            "mov {ax:x}, ax",
+            "int 0x31",
+            "mov {ax_err:x}, ax",
             "lahf",
-            ax = lateout(reg) ax,
-            in("ax") 0x0600u16,
-            in("dx") 0x00FFu16,
+            ax_err = lateout(reg) ax_err,
+            in("ax") 0x0300u16,
+            in("bx") 0x0021u16,
+            in("cx") 0x0000u16,
+            inlateout("edi") regs => regs,
             lateout("ax") flags,
         );
     }
-    if ((flags >> 8) as u8) & ZF == 0 {
-        Some(AlChar { al_char: ax as u8 })
+    if ((flags >> 8) as u8) & CF == 0 {
+        let mut rm_flags: u16;
+        let mut rm_eax: u32;
+        unsafe {
+            asm!(
+                "mov {rm_flags:x}, [{regs:e} + {regs_flags_offset}]",
+                "mov {rm_eax:e}, [{regs:e} + {regs_eax_offset}]",
+                regs = in(reg) regs,
+                rm_flags = out(reg) rm_flags,
+                rm_eax = out(reg) rm_eax,
+                regs_flags_offset = const offset_of!(RmRegs, flags),
+                regs_eax_offset = const offset_of!(RmRegs, eax),
+            );
+        }
+        if rm_flags & u16::from(ZF) == 0 {
+            Ok(Some(AlChar { al_char: rm_eax as u8 }))
+        } else {
+            Ok(None)
+        }
     } else {
-        None
+        Err(DpmiErr(ax_err))
     }
 }
 

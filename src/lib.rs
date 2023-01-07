@@ -453,7 +453,7 @@ pub struct AlChar {
 
 #[cfg(not(target_os="dos"))]
 #[allow(non_snake_case)]
-pub fn int_21h_ah_06h_dl_FFh_inkey() -> Option<AlChar> {
+pub fn int_21h_ah_06h_dl_FFh_inkey() -> Result<Option<AlChar>, DpmiErr> {
     panic!("cfg(target_os=\"dos\")");
 }
 

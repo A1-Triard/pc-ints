@@ -706,6 +706,23 @@ pub fn int_10h_ah_00h_set_video_mode(al_mode: u8) -> Result<(), AlErr> {
     NonZeroU8::new(al_err as u8).map(|al_err| AlErr { al_err }).map_or(Ok(()), Err)
 }
 
+#[cfg(not(target_os="dos"))]
+#[allow(unused_variables)]
+pub fn int_10h_ah_05h_set_video_active_page(al_active_page: u8) {
+    panic!("cfg(target_os=\"dos\")");
+}
+
+#[cfg(target_os="dos")]
+#[inline]
+pub fn int_10h_ah_05h_set_video_active_page(al_active_page: u8) {
+    unsafe {
+        asm!(
+            "int 0x10",
+            in("ax") 0x0500 | al_active_page as u16,
+        );
+    }
+}
+
 #[derive(Debug, Clone)]
 pub struct VideoMode {
     pub al_mode: u8,

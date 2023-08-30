@@ -141,6 +141,43 @@ pub fn int_21h_ah_30h_dos_ver() -> DosVer {
     DosVer { ah_minor: (ax >> 8) as u8, al_major: ax as u8 }
 }
 
+#[cfg(not(target_os="dos"))]
+pub fn int_21h_ah_33h_al_00h_get_ctrl_break_status() -> bool {
+    panic!("cfg(target_os=\"dos\")");
+}
+
+#[cfg(target_os="dos")]
+#[inline]
+pub fn int_21h_ah_33h_al_00h_get_ctrl_break_status() -> bool {
+    let mut dx: u16;
+    unsafe {
+        asm!(
+            "int 0x21",
+            in("ax") 0x3300u16,
+            lateout("dx") dx,
+        );
+    }
+    dx & 0xFF != 0
+}
+
+#[cfg(not(target_os="dos"))]
+#[allow(unused_variables)]
+pub fn int_21h_ah_33h_al_01h_set_ctrl_break_status(dl_ctrl_break_on: bool) {
+    panic!("cfg(target_os=\"dos\")");
+}
+
+#[cfg(target_os="dos")]
+#[inline]
+pub fn int_21h_ah_33h_al_01h_set_ctrl_break_status(dl_ctrl_break_on: bool) {
+    unsafe {
+        asm!(
+            "int 0x21",
+            in("ax") 0x3301u16,
+            in("dx") dl_ctrl_break_on as u8 as u16,
+        );
+    }
+}
+
 #[derive(Debug, Clone)]
 pub struct CodePage {
     pub bx_active: u16,

@@ -1,5 +1,3 @@
-#![feature(asm_const)]
-
 #![deny(warnings)]
 #![doc(test(attr(deny(warnings))))]
 #![doc(test(attr(allow(dead_code))))]

@@ -176,6 +176,23 @@ pub fn int_21h_ah_33h_al_01h_set_ctrl_break_status(dl_ctrl_break_on: bool) {
     }
 }
 
+pub fn int_10h_ah_02h_set_cursor_position(bh_video_page: u8, dh_row: u8, dl_column: u8) {
+    panic!("cfg(target_os=\"dos\")");
+}
+
+#[cfg(target_os="dos")]
+#[inline]
+pub fn int_10h_ah_02h_set_cursor_position(bh_video_page: u8, dh_row: u8, dl_column: u8) {
+    unsafe {
+        asm!(
+            "int 0x10",
+            in("ax") 0x0200u16,
+            in("bx") (bh_video_page as u16) << 8,
+            in("dx") ((dh_row as u16) << 8) | (dl_column as u16),
+        );
+    }
+}
+
 #[derive(Debug, Clone)]
 pub struct CodePage {
     pub bx_active: u16,

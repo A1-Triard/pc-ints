@@ -1,8 +1,8 @@
 [package]
 edition = "2021"
 name = "pc-ints"
-version = "0.3.6"
-rust-version = "1.82"
+version = "0.4.0"
+rust-version = "1.91"
 authors = ["warlock <internalmike@gmail.com>"]
 description = "PC retro interrupts (BIOS, DOS, VGA, DPMI, etc.)."
 readme = "README.md"
@@ -16,7 +16,7 @@ repository = "https://github.com/A1-Triard/pc-ints"
 unexpected_cfgs = { level = "allow" }
 
 [dependencies]
-memoffset = { version = "0.9.0", features = ["unstable_const"] }
+memoffset = { version = "0.9.1", features = ["unstable_const"] }
 
 [badges]
 maintenance = { status = "experimental" }

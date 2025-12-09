@@ -6,13 +6,13 @@
 
 #![no_std]
 
-#[cfg(target_os="dos")]
+#[cfg(dos)]
 use core::arch::asm;
 use core::mem::MaybeUninit;
-#[cfg(target_os="dos")]
+#[cfg(dos)]
 use core::mem::size_of;
 use core::num::NonZeroU8;
-#[cfg(target_os="dos")]
+#[cfg(dos)]
 use memoffset::offset_of;
 
 pub const DOS_ERR_FUNC_NUM_INVALID: u8 = 1;
@@ -93,14 +93,14 @@ pub const DOS_ERR_NET_WRITE_FAULT: u8 = 88;
 pub const DOS_ERR_NET_FUNC_NOT_SUPPORTED: u8 = 89;
 pub const DOS_ERR_SYS_COMPONENT_NOT_INSTALLED: u8 = 90;
 
-#[cfg(not(target_os="dos"))]
+#[cfg(not(dos))]
 #[allow(non_snake_case)]
 #[allow(unused_variables)]
 pub fn int_21h_ah_4Ch_exit(al_exit_code: u8) {
     panic!("cfg(target_os=\"dos\")");
 }
 
-#[cfg(target_os="dos")]
+#[cfg(dos)]
 #[allow(non_snake_case)]
 #[inline]
 pub fn int_21h_ah_4Ch_exit(al_exit_code: u8) {
@@ -118,12 +118,12 @@ pub struct DosVer {
     pub al_major: u8,
 }
 
-#[cfg(not(target_os="dos"))]
+#[cfg(not(dos))]
 pub fn int_21h_ah_30h_dos_ver() -> DosVer {
     panic!("cfg(target_os=\"dos\")");
 }
 
-#[cfg(target_os="dos")]
+#[cfg(dos)]
 #[inline]
 pub fn int_21h_ah_30h_dos_ver() -> DosVer {
     let mut ax: u16;
@@ -139,12 +139,12 @@ pub fn int_21h_ah_30h_dos_ver() -> DosVer {
     DosVer { ah_minor: (ax >> 8) as u8, al_major: ax as u8 }
 }
 
-#[cfg(not(target_os="dos"))]
+#[cfg(not(dos))]
 pub fn int_21h_ah_33h_al_00h_get_ctrl_break_status() -> bool {
     panic!("cfg(target_os=\"dos\")");
 }
 
-#[cfg(target_os="dos")]
+#[cfg(dos)]
 #[inline]
 pub fn int_21h_ah_33h_al_00h_get_ctrl_break_status() -> bool {
     let mut dx: u16;
@@ -158,13 +158,13 @@ pub fn int_21h_ah_33h_al_00h_get_ctrl_break_status() -> bool {
     dx & 0xFF != 0
 }
 
-#[cfg(not(target_os="dos"))]
+#[cfg(not(dos))]
 #[allow(unused_variables)]
 pub fn int_21h_ah_33h_al_01h_set_ctrl_break_status(dl_ctrl_break_on: bool) {
     panic!("cfg(target_os=\"dos\")");
 }
 
-#[cfg(target_os="dos")]
+#[cfg(dos)]
 #[inline]
 pub fn int_21h_ah_33h_al_01h_set_ctrl_break_status(dl_ctrl_break_on: bool) {
     unsafe {
@@ -176,13 +176,13 @@ pub fn int_21h_ah_33h_al_01h_set_ctrl_break_status(dl_ctrl_break_on: bool) {
     }
 }
 
-#[cfg(not(target_os="dos"))]
+#[cfg(not(dos))]
 #[allow(unused_variables)]
 pub fn int_10h_ah_02h_set_cursor_position(bh_video_page: u8, dh_row: u8, dl_column: u8) {
     panic!("cfg(target_os=\"dos\")");
 }
 
-#[cfg(target_os="dos")]
+#[cfg(dos)]
 #[inline]
 pub fn int_10h_ah_02h_set_cursor_position(bh_video_page: u8, dh_row: u8, dl_column: u8) {
     unsafe {
@@ -206,18 +206,18 @@ pub struct AxErr {
     pub ax_err: u16,
 }
 
-#[cfg(target_os="dos")]
+#[cfg(dos)]
 const CF: u8 = 0x01;
 
-#[cfg(target_os="dos")]
+#[cfg(dos)]
 const ZF: u8 = 0x40;
 
-#[cfg(not(target_os="dos"))]
+#[cfg(not(dos))]
 pub fn int_21h_ax_6601h_code_page() -> Result<CodePage, AxErr> {
     panic!("cfg(target_os=\"dos\")");
 }
 
-#[cfg(target_os="dos")]
+#[cfg(dos)]
 #[inline]
 pub fn int_21h_ax_6601h_code_page() -> Result<CodePage, AxErr> {
     let mut bx_active: u16;
@@ -243,7 +243,7 @@ pub fn int_21h_ax_6601h_code_page() -> Result<CodePage, AxErr> {
     }
 }
 
-#[cfg(target_os="dos")]
+#[cfg(dos)]
 #[inline]
 fn p32<T>(p: *const T) -> u32 {
     assert!(size_of::<*const T>() == size_of::<u32>());
@@ -255,13 +255,13 @@ pub struct AlLastCh {
     pub al_last_ch: u8,
 }
 
-#[cfg(not(target_os="dos"))]
+#[cfg(not(dos))]
 #[allow(unused_variables)]
 pub fn int_21h_ah_02h_out_ch(dl_ch: u8) -> AlLastCh {
     panic!("cfg(target_os=\"dos\")");
 }
 
-#[cfg(target_os="dos")]
+#[cfg(dos)]
 #[inline]
 pub fn int_21h_ah_02h_out_ch(dl_ch: u8) -> AlLastCh {
     let mut ax: u16;
@@ -276,13 +276,13 @@ pub fn int_21h_ah_02h_out_ch(dl_ch: u8) -> AlLastCh {
     AlLastCh { al_last_ch: ax as u8 }
 }
 
-#[cfg(not(target_os="dos"))]
+#[cfg(not(dos))]
 #[allow(unused_variables)]
 pub fn int_21h_ah_09h_out_str(dx_str_24h: *const u8) {
     panic!("cfg(target_os=\"dos\")");
 }
 
-#[cfg(target_os="dos")]
+#[cfg(dos)]
 #[inline]
 pub fn int_21h_ah_09h_out_str(dx_str_24h: *const u8) {
     unsafe {
@@ -300,14 +300,14 @@ pub struct AxHandle {
     pub ax_handle: u16,
 }
 
-#[cfg(not(target_os="dos"))]
+#[cfg(not(dos))]
 #[allow(non_snake_case)]
 #[allow(unused_variables)]
 pub fn int_21h_ah_3Dh_open(dx_path_z: *const u8, al_mode: u8) -> Result<AxHandle, AxErr> {
     panic!("cfg(target_os=\"dos\")");
 }
 
-#[cfg(target_os="dos")]
+#[cfg(dos)]
 #[allow(non_snake_case)]
 #[inline]
 pub fn int_21h_ah_3Dh_open(dx_path_z: *const u8, al_mode: u8) -> Result<AxHandle, AxErr> {
@@ -331,14 +331,14 @@ pub fn int_21h_ah_3Dh_open(dx_path_z: *const u8, al_mode: u8) -> Result<AxHandle
     }
 }
 
-#[cfg(not(target_os="dos"))]
+#[cfg(not(dos))]
 #[allow(non_snake_case)]
 #[allow(unused_variables)]
 pub fn int_21h_ah_3Eh_close(bx_handle: u16) -> Result<(), AxErr> {
     panic!("cfg(target_os=\"dos\")");
 }
 
-#[cfg(target_os="dos")]
+#[cfg(dos)]
 #[allow(non_snake_case)]
 #[inline]
 pub fn int_21h_ah_3Eh_close(bx_handle: u16) -> Result<(), AxErr> {
@@ -367,14 +367,14 @@ pub struct AxRead {
     pub ax_read: u16,
 }
 
-#[cfg(not(target_os="dos"))]
+#[cfg(not(dos))]
 #[allow(non_snake_case)]
 #[allow(unused_variables)]
 pub fn int_21h_ah_3Fh_read(bx_handle: u16, dx_cx_buf: &mut [MaybeUninit<u8>]) -> Result<AxRead, AxErr> {
     panic!("cfg(target_os=\"dos\")");
 }
 
-#[cfg(target_os="dos")]
+#[cfg(dos)]
 #[allow(non_snake_case)]
 #[inline]
 pub fn int_21h_ah_3Fh_read(bx_handle: u16, dx_cx_buf: &mut [MaybeUninit<u8>]) -> Result<AxRead, AxErr> {
@@ -405,13 +405,13 @@ pub struct AxWritten {
     pub ax_written: u16,
 }
 
-#[cfg(not(target_os="dos"))]
+#[cfg(not(dos))]
 #[allow(unused_variables)]
 pub fn int_21h_ah_40h_write(bx_handle: u16, dx_cx_buf: &[u8]) -> Result<AxWritten, AxErr> {
     panic!("cfg(target_os=\"dos\")");
 }
 
-#[cfg(target_os="dos")]
+#[cfg(dos)]
 #[inline]
 pub fn int_21h_ah_40h_write(bx_handle: u16, dx_cx_buf: &[u8]) -> Result<AxWritten, AxErr> {
     let mut flags: u16;
@@ -447,13 +447,13 @@ pub struct AllocErr {
     pub bx_available_paragraphs: u16,
 }
 
-#[cfg(not(target_os="dos"))]
+#[cfg(not(dos))]
 #[allow(unused_variables)]
 pub fn int_21h_ah_48h_alloc(bx_paragraphs: u16) -> Result<AxSegment, AllocErr> {
     panic!("cfg(target_os=\"dos\")");
 }
 
-#[cfg(target_os="dos")]
+#[cfg(dos)]
 #[inline]
 pub fn int_21h_ah_48h_alloc(bx_paragraphs: u16) -> Result<AxSegment, AllocErr> {
     let mut ebx_paragraphs = bx_paragraphs as u32;
@@ -482,12 +482,12 @@ pub struct BxSegment {
     pub bx_segment: u16,
 }
 
-#[cfg(not(target_os="dos"))]
+#[cfg(not(dos))]
 pub fn int_21h_ah_62h_psp_addr() -> BxSegment {
     panic!("cfg(target_os=\"dos\")");
 }
 
-#[cfg(target_os="dos")]
+#[cfg(dos)]
 #[inline]
 pub fn int_21h_ah_62h_psp_addr() -> BxSegment {
     let mut bx_segment: u16;
@@ -506,13 +506,13 @@ pub struct AlChar {
     pub al_char: u8,
 }
 
-#[cfg(not(target_os="dos"))]
+#[cfg(not(dos))]
 #[allow(non_snake_case)]
 pub fn int_21h_ah_06h_dl_FFh_inkey() -> Result<Option<AlChar>, DpmiErr> {
     panic!("cfg(target_os=\"dos\")");
 }
 
-#[cfg(target_os="dos")]
+#[cfg(dos)]
 #[repr(C)]
 struct RmRegs {
     edi: u32,
@@ -536,7 +536,7 @@ struct RmRegs {
 
 pub struct DpmiErr(pub u16);
 
-#[cfg(target_os="dos")]
+#[cfg(dos)]
 #[allow(non_snake_case)]
 #[inline]
 pub fn int_21h_ah_06h_dl_FFh_inkey() -> Result<Option<AlChar>, DpmiErr> {
@@ -594,13 +594,13 @@ pub struct CxDxAddr {
     pub dx_offset: u16,
 }
 
-#[cfg(not(target_os="dos"))]
+#[cfg(not(dos))]
 #[allow(unused_variables)]
 pub fn int_31h_ax_0006h_segment_addr(bx_selector: u16) -> Result<CxDxAddr, AxErr> {
     panic!("cfg(target_os=\"dos\")");
 }
 
-#[cfg(target_os="dos")]
+#[cfg(dos)]
 #[inline]
 pub fn int_31h_ax_0006h_segment_addr(bx_selector: u16) -> Result<CxDxAddr, AxErr> {
     let mut flags: u16;
@@ -627,13 +627,13 @@ pub fn int_31h_ax_0006h_segment_addr(bx_selector: u16) -> Result<CxDxAddr, AxErr
     }
 }
 
-#[cfg(not(target_os="dos"))]
+#[cfg(not(dos))]
 #[allow(unused_variables)]
 pub fn int_31h_ax_0200h_get_rm_int(bl_vec_num: u8) -> CxDxAddr {
     panic!("cfg(target_os=\"dos\")");
 }
 
-#[cfg(target_os="dos")]
+#[cfg(dos)]
 #[inline]
 pub fn int_31h_ax_0200h_get_rm_int(bl_vec_num: u8) -> CxDxAddr {
     let mut cx: u16;
@@ -650,13 +650,13 @@ pub fn int_31h_ax_0200h_get_rm_int(bl_vec_num: u8) -> CxDxAddr {
     CxDxAddr { cx_segment: cx, dx_offset: dx }
 }
 
-#[cfg(not(target_os="dos"))]
+#[cfg(not(dos))]
 #[allow(unused_variables)]
 pub fn int_31h_ax_0201h_set_rm_int(bl_vec_num: u8, cx_int_handler_segment: u16, dx_int_handler_offset: u16) {
     panic!("cfg(target_os=\"dos\")");
 }
 
-#[cfg(target_os="dos")]
+#[cfg(dos)]
 #[inline]
 pub fn int_31h_ax_0201h_set_rm_int(bl_vec_num: u8, cx_int_handler_segment: u16, dx_int_handler_offset: u16) {
     unsafe {
@@ -676,13 +676,13 @@ pub struct RmAlloc {
     pub dx_selector: u16,
 }
 
-#[cfg(not(target_os="dos"))]
+#[cfg(not(dos))]
 #[allow(unused_variables)]
 pub fn int_31h_ax_0100h_rm_alloc(bx_paragraphs: u16) -> Result<RmAlloc, AllocErr> {
     panic!("cfg(target_os=\"dos\")");
 }
 
-#[cfg(target_os="dos")]
+#[cfg(dos)]
 #[inline]
 pub fn int_31h_ax_0100h_rm_alloc(mut bx_paragraphs: u16) -> Result<RmAlloc, AllocErr> {
     let mut flags: u16;
@@ -707,13 +707,13 @@ pub fn int_31h_ax_0100h_rm_alloc(mut bx_paragraphs: u16) -> Result<RmAlloc, Allo
     }
 }
 
-#[cfg(not(target_os="dos"))]
+#[cfg(not(dos))]
 #[allow(unused_variables)]
 pub fn int_31h_ax_0101h_rm_free(dx_selector: u16) -> Result<(), AxErr> {
     panic!("cfg(target_os=\"dos\")");
 }
 
-#[cfg(target_os="dos")]
+#[cfg(dos)]
 #[inline]
 pub fn int_31h_ax_0101h_rm_free(dx_selector: u16) -> Result<(), AxErr> {
     let mut flags: u16;
@@ -741,13 +741,13 @@ pub struct AlErr {
     pub al_err: NonZeroU8,
 }
 
-#[cfg(not(target_os="dos"))]
+#[cfg(not(dos))]
 #[allow(unused_variables)]
 pub fn int_10h_ah_00h_set_video_mode(al_mode: u8) -> Result<(), AlErr> {
     panic!("cfg(target_os=\"dos\")");
 }
 
-#[cfg(target_os="dos")]
+#[cfg(dos)]
 #[inline]
 pub fn int_10h_ah_00h_set_video_mode(al_mode: u8) -> Result<(), AlErr> {
     let mut al_err: u16;
@@ -761,13 +761,13 @@ pub fn int_10h_ah_00h_set_video_mode(al_mode: u8) -> Result<(), AlErr> {
     NonZeroU8::new(al_err as u8).map(|al_err| AlErr { al_err }).map_or(Ok(()), Err)
 }
 
-#[cfg(not(target_os="dos"))]
+#[cfg(not(dos))]
 #[allow(unused_variables)]
 pub fn int_10h_ah_05h_set_video_active_page(al_active_page: u8) {
     panic!("cfg(target_os=\"dos\")");
 }
 
-#[cfg(target_os="dos")]
+#[cfg(dos)]
 #[inline]
 pub fn int_10h_ah_05h_set_video_active_page(al_active_page: u8) {
     unsafe {
@@ -785,14 +785,14 @@ pub struct VideoMode {
     pub bh_active_page: u8,
 }
 
-#[cfg(not(target_os="dos"))]
+#[cfg(not(dos))]
 #[allow(non_snake_case)]
 #[allow(unused_variables)]
 pub fn int_10h_ah_0Fh_video_mode() -> VideoMode {
     panic!("cfg(target_os=\"dos\")");
 }
 
-#[cfg(target_os="dos")]
+#[cfg(dos)]
 #[allow(non_snake_case)]
 #[inline]
 pub fn int_10h_ah_0Fh_video_mode() -> VideoMode {
@@ -817,13 +817,13 @@ pub struct IntHandler {
     pub ebx_int_handler: u32,
 }
 
-#[cfg(not(target_os="dos"))]
+#[cfg(not(dos))]
 #[allow(unused_variables)]
 pub fn int_21h_ah_35h_get_int(al_vec_num: u8) -> IntHandler {
     panic!("cfg(target_os=\"dos\")");
 }
 
-#[cfg(target_os="dos")]
+#[cfg(dos)]
 #[inline]
 pub fn int_21h_ah_35h_get_int(al_vec_num: u8) -> IntHandler {
     let mut ebx_int_handler: u32;
@@ -837,13 +837,13 @@ pub fn int_21h_ah_35h_get_int(al_vec_num: u8) -> IntHandler {
     IntHandler { ebx_int_handler }
 }
 
-#[cfg(not(target_os="dos"))]
+#[cfg(not(dos))]
 #[allow(unused_variables)]
 pub fn int_21h_ah_25h_set_int(al_vec_num: u8, edx_int_handler: u32) {
     panic!("cfg(target_os=\"dos\")");
 }
 
-#[cfg(target_os="dos")]
+#[cfg(dos)]
 #[inline]
 pub fn int_21h_ah_25h_set_int(al_vec_num: u8, edx_int_handler: u32) {
     unsafe {
